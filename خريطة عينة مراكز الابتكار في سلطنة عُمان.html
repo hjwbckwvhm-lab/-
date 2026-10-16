@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خريطة عينة مراكز الابتكار في سلطنة عُمان</title>
+<style>/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{/* لوحة الألوان: عدّل هذه القيم لتطابق هوية الجامعة */--bg:#eef2f3;--surface:#fff;--ink:#12303a;--mute:#5b707a;--line:#d5dee1;
+--gov:#0e5a6e;--uni:#c27a0e;--pri:#7b3f8c;--accent:#0e5a6e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c21;--surface:#16272e;--ink:#e6eef0;--mute:#9bb0b8;--line:#2a3f47;--gov:#4fb3cc;--uni:#e8a63f;--pri:#c48bd6;--accent:#4fb3cc}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+header{padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header h1{font-size:1.15rem;margin:0;flex:1;min-width:240px;line-height:1.5}
+header small{display:block;color:var(--mute);font-weight:400;font-size:.8rem}
+button{font:inherit;cursor:pointer}
+.lang{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:6px 12px}
+.bar{display:flex;gap:18px;flex-wrap:wrap;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line);align-items:center}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grp>span{color:var(--mute);font-size:.8rem;margin-inline-end:4px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chip:focus-visible,.lang:focus-visible,.row:focus-visible{outline:2px solid var(--uni);outline-offset:2px}
+main{flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0}
+#map{min-height:420px;background:var(--line)}
+aside{background:var(--surface);border-inline-start:1px solid var(--line);overflow:auto;padding:16px 18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.kpi{background:var(--bg);border-radius:8px;padding:8px;text-align:center}
+.kpi b{display:block;font-size:1.3rem}.kpi span{font-size:.72rem;color:var(--mute)}
+h2{font-size:.95rem;margin:16px 0 8px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.card h3{margin:0 0 2px;font-size:1rem}.card .sub{color:var(--mute);font-size:.85rem;margin-bottom:8px}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--bg);margin:0 0 4px 4px;border:1px solid var(--line)}
+dl{margin:8px 0 0;font-size:.85rem;display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+dt{color:var(--mute)}dd{margin:0;word-break:break-all;direction:ltr;text-align:start}
+.row{display:flex;gap:8px;align-items:center;padding:7px 6px;border-bottom:1px solid var(--line);cursor:pointer;font-size:.88rem;border-radius:6px;background:none;width:100%;text-align:start;color:var(--ink);border-inline:0;border-top:0}
+.row:hover{background:var(--bg)}
+.row i{width:10px;height:10px;border-radius:50%;flex:none}
+.pillar{border-inline-start:4px solid var(--accent);padding:6px 10px;margin-bottom:8px;background:var(--bg);border-radius:4px;font-size:.84rem}
+.pillar b{display:block}.pillar em{font-style:normal;color:var(--mute)}
+.note{font-size:.75rem;color:var(--mute);line-height:1.7;margin-top:12px}
+.note a{color:var(--accent)}
+.pin{width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.pin.sel{outline:3px solid #fff;box-shadow:0 0 0 5px rgba(14,90,110,.5)}
+.hx{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:6px 0 4px}.hx i{display:block}.lg{display:flex;gap:10px;flex-wrap:wrap;font-size:.75rem;color:var(--mute);margin-bottom:6px}.lg b{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:4px}.ins{font-size:.84rem;line-height:1.8;margin:6px 0;padding-inline-start:16px}.gap{color:#b3261e;font-weight:700}.mt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:.84rem}@media(max-width:820px){main{grid-template-columns:1fr;grid-template-rows:55vh auto}aside{border-inline-start:0;border-top:1px solid var(--line)}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<h1 id="title"></h1>
+<button class="lang" id="oBtn"></button><button class="lang" id="cBtn"></button><button class="lang" id="langBtn">English</button>
+</header>
+<div class="bar" id="bar"></div>
+<main>
+<div id="map" role="application"></div>
+<aside id="panel"></aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// بيانات العينة (14 جهة). التصنيف الوظيفي (role) والركيزة (pillar) مقترحان تحليلياً من الباحث وقابلان للتعديل.
+var D=[
+{en:"Ministry of Education",ar:"وزارة التربية والتعليم",t:"gov",r:"policy",p:1,la:23.588226,lo:58.323425},
+{en:"Research and Innovation Authority",ar:"هيئة البحث العلمي والابتكار",t:"gov",r:"policy",p:3,la:23.5917,lo:58.1696},
+{en:"Authority for Small and Medium Enterprises Development (ASMED)",ar:"هيئة تنمية المؤسسات الصغيرة والمتوسطة",t:"gov",r:"support",p:2,la:23.59867,lo:58.42747},
+{en:"Industrial Innovation Academy",ar:"أكاديمية الابتكار الصناعي",t:"gov",r:"industry",p:2,la:23.5659,lo:58.1665,e:"sulaiman@iia.om",ph:"+968 9520 0324"},
+{en:"OQ Group",ar:"مجموعة أوكيو",t:"gov",r:"industry",p:2,la:23.58068,lo:58.32688,e:"ammar.alojaili@oq.com",ph:"+968 9403 3234"},
+{en:"Asyad Group",ar:"مجموعة أسياد",t:"gov",r:"industry",p:2,la:23.55698,lo:58.40006,e:"ahmed.alghafri@asyad.com",ph:"+968 9322 2186"},
+{en:"Matterz Group",ar:"مجموعة ماترز",t:"pri",r:"industry",p:2,la:23.59679,lo:58.18389,e:"Fatma@matterz.om, Maryam@matterz.om",ph:"+968 9881 9966"},
+{en:"MB Holding Company LLC",ar:"مجموعة إم بي القابضة",t:"pri",r:"industry",p:2,la:23.60042,lo:58.34971,e:"rahma@mbholdingco.com, asma.alhasni@mbholdingco.com",ph:"+968 9541 8888"},
+{en:"Sultan Qaboos University (SQU)",ar:"جامعة السلطان قابوس",t:"uni",r:"research",p:1,la:23.59115,lo:58.17136},
+{en:"German University of Technology in Oman (GUtech)",ar:"الجامعة الألمانية للتكنولوجيا في عُمان",t:"uni",r:"research",p:1,la:23.63628,lo:58.04593,e:"amjaad.alhinai@gutech.edu.om",ph:"+968 2206 1014"},
+{en:"Middle East College (MEC)",ar:"كلية الشرق الأوسط",t:"uni",r:"research",p:1,la:23.56804,lo:58.16679},
+{en:"Arab Open University (AOU)",ar:"الجامعة العربية المفتوحة – عُمان",t:"uni",r:"research",p:1,la:23.65523,lo:58.05733,e:"amani.a@aou.edu.om",ph:"+968 2495 7327"},
+{en:"National University of Science and Technology (NU)",ar:"الجامعة الوطنية للعلوم والتكنولوجيا",t:"uni",r:"research",p:1,la:23.55208,lo:58.39907},
+{en:"Modern College of Business and Science (MCBS)",ar:"الكلية الحديثة للتجارة والعلوم",t:"uni",r:"research",p:1,la:23.55345,lo:58.402}
+];
+var T={
+ar:{dir:"rtl",lang:"English",title:"خريطة تفاعلية لعينة مراكز الابتكار في سلطنة عُمان",sub:"عينة من 14 جهة وليست حصراً شاملاً لجميع المراكز",
+type:"نوع الجهة",role:"الدور في المنظومة",all:"الكل",gov:"حكومية",uni:"أكاديمية",pri:"قطاع خاص",
+policy:"سياسات وحوكمة",support:"دعم وتمكين المنشآت",research:"بحث وتعليم وكفاءات",industry:"تطبيق صناعي وتجاري",
+n:"جهات معروضة",nm:"مواقع",pil:"ركائز رؤية عُمان 2040",pillar:"الركيزة المقترحة",
+p1:"الإنسان والمجتمع",p2:"الاقتصاد والتنمية",p3:"الحوكمة والأداء المؤسسي",
+p1d:"بناء القدرات البحثية والكفاءات الوطنية",p2d:"التنويع الاقتصادي وتمكين القطاع الخاص والصناعة",p3d:"السياسات ومنظومة البحث والابتكار",
+sel:"اختر جهة من الخريطة أو القائمة لعرض بياناتها",list:"قائمة الجهات",em:"البريد",ph:"الهاتف",co:"الإحداثيات",
+oman:"السلطنة كاملة",cap:"منطقة العاصمة",col:"تلوين حسب",byType:"نوع الجهة",byPillar:"ركيزة 2040",sh:"مؤشرات استراتيجية أولية",hx:"توازن الحلزون الثلاثي (حكومة / أكاديميا / قطاع خاص)",fin:"تمويل واستثمار وحاضنات ومسرّعات (فجوة في العينة)",i1:"حضور القطاع الخاص في العينة المعروضة نحو %، ما يستدعي تعزيز الشراكة بين الجامعات والقطاع الخاص.",i2:"الجهات المعروضة متمركزة ضمن نطاق نحو % كم حول مركز العينة، ما يشير إلى تركز جغرافي في منطقة العاصمة وحاجة لتوسيع التغطية للمحافظات.",i3:"لا توجد في العينة جهة مصنفة كحاضنة أو مسرّع أو صندوق تمويل، وهي حلقة مهمة في سلسلة الابتكار تُستكمل في الحصر الشامل.",note:"التصنيف الوظيفي والركيزة مقترحان تحليلياً من الباحث ويُراجعان وفق منهجية الدراسة. البريد والهاتف كما وردت في بيانات العينة.",
+none:"غير متوفر",tp:{gov:"حكومية",uni:"جامعة / كلية",pri:"قطاع خاص"}},
+en:{dir:"ltr",lang:"العربية",title:"Interactive Map of a Sample of Innovation Centres in Oman",sub:"A sample of 14 institutions, not a census of all centres",
+type:"Institution type",role:"Ecosystem role",all:"All",gov:"Government",uni:"Academic",pri:"Private",
+policy:"Policy & governance",support:"Enterprise support",research:"Research & talent",industry:"Industrial & commercial application",
+n:"Institutions shown",nm:"Locations",pil:"Oman Vision 2040 pillars",pillar:"Proposed pillar",
+p1:"People & Society",p2:"Economy & Development",p3:"Governance & Institutional Performance",
+p1d:"Research capacity and national talent",p2d:"Diversification, private sector and industry",p3d:"Research and innovation policy ecosystem",
+sel:"Select an institution on the map or list to see its data",list:"Institutions",em:"Email",ph:"Phone",co:"Coordinates",
+oman:"Whole Oman",cap:"Capital area",col:"Colour by",byType:"Type",byPillar:"Vision 2040 pillar",sh:"Preliminary strategic indicators",hx:"Triple-helix balance (government / academia / private)",fin:"Finance, incubators & accelerators (gap in sample)",i1:"Private-sector share in the displayed sample is about %, calling for stronger university-industry partnerships.",i2:"Displayed institutions sit within about % km of the sample centre, indicating capital-area concentration and a need to extend coverage to other governorates.",i3:"No institution in the sample is classified as an incubator, accelerator or funding vehicle, a key link in the innovation chain to complete in a full inventory.",note:"Role and pillar are the researcher's proposed analytical classification, to be reviewed against the study method. Emails and phones are as supplied in the sample data.",
+none:"Not available",tp:{gov:"Government",uni:"University / College",pri:"Private"}}
+};
+var fC="type",HEXP={1:"#2a7f62",2:"#c27a0e",3:"#0e5a6e"},LG="ar",fT="all",fR="all",selI=null,mk=[];
+var COL={gov:"var(--gov)",uni:"var(--uni)",pri:"var(--pri)"};
+var HEX={gov:"#0e5a6e",uni:"#c27a0e",pri:"#7b3f8c"};
+var map=L_map();
+var OMN={"type":"FeatureCollection","features":[
+{"type":"Feature","id":"OMN","properties":{"name":"Oman"},"geometry":{"type":"MultiPolygon","coordinates":[[[[58.861141,21.114035],[58.487986,20.428986],[58.034318,20.481437],[57.826373,20.243002],[57.665762,19.736005],[57.7887,19.06757],[57.694391,18.94471],[57.234264,18.947991],[56.609651,18.574267],[56.512189,18.087113],[56.283521,17.876067],[55.661492,17.884128],[55.269939,17.632309],[55.2749,17.228354],[54.791002,16.950697],[54.239253,17.044981],[53.570508,16.707663],[53.108573,16.651051],[52.782184,17.349742],[52.00001,19.000003],[54.999982,19.999994],[55.666659,22.000001],[55.208341,22.70833],[55.234489,23.110993],[55.525841,23.524869],[55.528632,23.933604],[55.981214,24.130543],[55.804119,24.269604],[55.886233,24.920831],[56.396847,24.924732],[56.84514,24.241673],[57.403453,23.878594],[58.136948,23.747931],[58.729211,23.565668],[59.180502,22.992395],[59.450098,22.660271],[59.80806,22.533612],[59.806148,22.310525],[59.442191,21.714541],[59.282408,21.433886],[58.861141,21.114035]]],[[[56.391421,25.895991],[56.261042,25.714606],[56.070821,26.055464],[56.362017,26.395934],[56.485679,26.309118],[56.391421,25.895991]]]]}}
+]};
+var oman=window.L.geoJSON(OMN,{style:{color:"#0e5a6e",weight:2,fillColor:"#0e5a6e",fillOpacity:.12},interactive:false}).addTo(map);
+function showOman(){map.flyToBounds(oman.getBounds(),{padding:[20,20],duration:.8})}
+function showCapital(){map.flyTo([23.595,58.25],11,{duration:.8})}
+map.fitBounds(oman.getBounds(),{padding:[20,20]});
+function L_map(){var m=L.map("map",{zoomControl:true}).setView([23.595,58.25],11);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(m);return m}
+function nm(d){return LG==="ar"?d.ar:d.en}
+function icon(d,s){return L_icon(d,s)}
+function pc(d){return fC==="type"?HEX[d.t]:HEXP[d.p]}
+function km(a,b,c,d){var R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h))}
+function L_icon(d,s){return window.L.divIcon({className:"",html:'<div class="pin'+(s?" sel":"")+'" style="background:'+pc(d)+'"></div>',iconSize:[22,22],iconAnchor:[11,22]})}
+D.forEach(function(d,i){d.i=i;d.m=window.L.marker([d.la,d.lo],{icon:L_icon(d,false),title:d.en}).on("click",function(){pick(i)}).addTo(map)});
+function vis(d){return(fT==="all"||d.t===fT)&&(fR==="all"||d.r===fR)}
+function chip(g,v,label,col){return '<button class="chip" data-g="'+g+'" data-v="'+v+'" aria-pressed="'+((g==="t"?fT:g==="c"?fC:fR)===v)+'">'+(col?'<i style="background:'+col+'"></i>':"")+label+"</button>"}
+function render(){
+var t=T[LG];document.documentElement.lang=LG;document.documentElement.dir=t.dir;
+document.getElementById("title").innerHTML=t.title+"<small>"+t.sub+"</small>";
+document.getElementById("langBtn").textContent=t.lang;document.getElementById("oBtn").textContent=t.oman;document.getElementById("cBtn").textContent=t.cap;
+document.getElementById("bar").innerHTML='<div class="grp"><span>'+t.type+'</span>'+chip("t","all",t.all)+["gov","uni","pri"].map(function(k){return chip("t",k,t[k],fC==="type"?COL[k]:"")}).join("")+'</div><div class="grp"><span>'+t.role+'</span>'+chip("r","all",t.all)+["policy","support","research","industry"].map(function(k){return chip("r",k,t[k])}).join("")+'</div><div class="grp"><span>'+t.col+'</span>'+chip("c","type",t.byType)+chip("c","pillar",t.byPillar)+"</div>";
+var V=D.filter(vis);
+D.forEach(function(d){var on=vis(d);if(on&&!map.hasLayer(d.m))d.m.addTo(map);if(!on&&map.hasLayer(d.m))map.removeLayer(d.m);d.m.setIcon(L_icon(d,d.i===selI))});
+var h='<div class="kpis"><div class="kpi"><b>'+V.length+"</b><span>"+t.n+'</span></div>'+["gov","uni","pri"].map(function(k){return '<div class="kpi"><b>'+V.filter(function(d){return d.t===k}).length+"</b><span>"+t[k]+"</span></div>"}).join("")+"</div>";
+
+var N=V.length||1,cnt=function(f){return V.filter(f).length},g=cnt(function(d){return d.t==="gov"}),u=cnt(function(d){return d.t==="uni"}),p=cnt(function(d){return d.t==="pri"});
+var cx=V.reduce(function(a,d){return a+d.la},0)/N,cy=V.reduce(function(a,d){return a+d.lo},0)/N,mx=0;V.forEach(function(d){mx=Math.max(mx,km(cx,cy,d.la,d.lo))});
+var pr=Math.round(p/N*100),rl=["policy","support","research","industry"].map(function(k){return [k,cnt(function(d){return d.r===k})]});
+var legend='<div class="lg">'+(fC==="type"?["gov","uni","pri"].map(function(k){return '<span><b style="background:'+HEX[k]+'"></b>'+t[k]+"</span>"}):[1,2,3].map(function(k){return '<span><b style="background:'+HEXP[k]+'"></b>'+t["p"+k]+"</span>"})).join("")+"</div>";
+var S="<h2>"+t.sh+'</h2><div class="hx" role="img" aria-label="'+t.hx+'"><i style="width:'+g/N*100+"%;background:"+HEX.gov+'"></i><i style="width:'+u/N*100+"%;background:"+HEX.uni+'"></i><i style="width:'+p/N*100+"%;background:"+HEX.pri+'"></i></div><div class="lg">'+t.hx+": "+g+" / "+u+" / "+p+"</div>"
++'<div class="mt">'+rl.map(function(x){return "<span>"+t[x[0]]+"</span><b>"+x[1]+"</b>"}).join("")+'<span class="gap">'+t.fin+'</span><b class="gap">0</b></div>'
++'<ul class="ins"><li>'+t.i1.replace("%",pr+"%")+"</li><li>"+t.i2.replace("%",Math.ceil(mx))+"</li><li>"+t.i3+"</li></ul>";
+if(selI===null){h+='<p style="color:var(--mute);font-size:.9rem">'+t.sel+"</p>"}else{var d=D[selI];
+h+='<div class="card"><h3>'+nm(d)+'</h3><div class="sub">'+(LG==="ar"?d.en:d.ar)+'</div><span class="tag">'+t.tp[d.t]+'</span><span class="tag">'+t[d.r]+'</span><span class="tag">'+t.pillar+": "+t["p"+d.p]+"</span><dl><dt>"+t.em+"</dt><dd>"+(d.e||t.none)+"</dd><dt>"+t.ph+"</dt><dd>"+(d.ph||t.none)+"</dd><dt>"+t.co+"</dt><dd>"+d.la+", "+d.lo+"</dd></dl></div>"}
+h+=legend;
+h+="<h2>"+t.list+"</h2>"+V.map(function(d){return '<button class="row" data-i="'+d.i+'"><i style="background:'+pc(d)+'"></i>'+nm(d)+"</button>"}).join("");
+h+="<h2>"+t.pil+"</h2>"+[1,2,3].map(function(p){var c=V.filter(function(d){return d.p===p}).length;return '<div class="pillar"><b>'+t["p"+p]+" ("+c+')</b><em>'+t["p"+p+"d"]+"</em></div>"}).join("");
+h+=S;
+h+='<p class="note">'+t.note+"</p>";
+document.getElementById("panel").innerHTML=h}
+function pick(i){selI=i;map.flyTo([D[i].la,D[i].lo],14,{duration:.8});render()}
+document.addEventListener("click",function(e){var c=e.target.closest(".chip"),r=e.target.closest(".row");
+if(c){if(c.dataset.g==="t")fT=c.dataset.v;else if(c.dataset.g==="c")fC=c.dataset.v;else fR=c.dataset.v;if(selI!==null&&!vis(D[selI]))selI=null;render()}
+if(r)pick(+r.dataset.i)});
+document.getElementById("oBtn").onclick=showOman;document.getElementById("cBtn").onclick=showCapital;
+document.getElementById("langBtn").onclick=function(){LG=LG==="ar"?"en":"ar";render()};
+render();
+</script>
+</body>
+</html>
